@@ -16,5 +16,6 @@ namespace Entities.DTOs
         public int CategoryId { get; set; }
         public string CoverPhoto { get; set; }
         public bool IsSlider { get; set; }
+        public List<ProductPictureDTO> ProductPicture { get; set; }
     }
 }

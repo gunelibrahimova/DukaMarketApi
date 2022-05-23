@@ -16,6 +16,5 @@ namespace Business.Abstract
         void Remove(Product product);
         void Update(UpdateProductDTO product);   
         ProductDTO GetProductById(int id);
-
     }
 }
