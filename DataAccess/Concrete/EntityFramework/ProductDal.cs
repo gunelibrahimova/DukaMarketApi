@@ -71,6 +71,7 @@ namespace DataAccess.Concrete.EntityFramework
                     CategoryName = product.Category.Name,
                     Price = product.Price,
                     SKU = product.SKU,
+                    ReviewCount = ratingCount,
                     Summary = product.Summary,
                     ProductPicture = pictures,
                     CoverPhoto = product.CoverPhoto,

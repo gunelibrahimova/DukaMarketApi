@@ -18,6 +18,7 @@ namespace Entities.DTOs
         public string CoverPhoto { get; set; }
         public bool IsSlider { get; set; }
         public decimal Rating { get; set; }
+        public int ReviewCount { get; set; }
         public string CategoryName { get; set; }
         public List<string> ProductPicture { get; set; }
         public List<CommentDTO> Comments { get; set; }

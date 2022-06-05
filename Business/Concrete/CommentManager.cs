@@ -33,7 +33,8 @@ namespace Business.Concrete
             _commentDal.Add(com);
         }
 
-        public List<Comment> GetCommentById(int productId)
+
+        public List<Comment> GetCommentById( int productId)
         {
             return _commentDal.GetAll(x=>x.ProductId == productId);
         }

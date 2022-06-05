@@ -1,15 +1,38 @@
 using Business.Abstract;
 using Business.Concrete;
+using Core.Entity.Models;
+using Core.Security.Hashing;
+using Core.Security.Models;
+using Core.Security.TokenHandler;
 using DataAccess.Abstract;
 using DataAccess.Concrete.EntityFramework;
 using Entities.Concrete;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+
+builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
+{
+    var key = Encoding.ASCII.GetBytes(builder.Configuration["JWTConfig:Key"]);
+
+    option.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateAudience = false,
+        ValidateIssuer = false,
+    };
+});
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
@@ -33,6 +56,28 @@ builder.Services.AddScoped<ICommentManager, CommentManager>();
 builder.Services.AddScoped<IProductPictureDal, ProductPictureDal>();
 builder.Services.AddScoped<IProductPictureManager, ProductPictureManager>();
 
+
+//builder.Services.AddDefaultIdentity<K205User>().AddRoles<IdentityRole>()
+//    .AddEntityFrameworkStores<ShopDbContext>();
+
+
+builder.Services.AddScoped<IAuthDal,AuthDal>();
+builder.Services.AddScoped<IAuthManager, AuthManager>();
+
+builder.Services.AddScoped<IRoleDal, RoleDal>();
+builder.Services.AddScoped<IRoleManager, RoleManager>();
+
+builder.Services.AddScoped<IUserRoleDal, UserRoleDal>();
+builder.Services.AddScoped<IUserRoleManager, UserRoleManager>();
+
+
+builder.Services.AddScoped<HashingHandler>();
+builder.Services.AddScoped<TokenGenerator>();
+builder.Services.AddScoped<JWTConfig>();
+
+
+//builder.Services.AddScoped<K205>
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(MyAllowSpecificOrigins,
@@ -43,8 +88,6 @@ builder.Services.AddCors(options =>
             AllowAnyMethod();
         });
 });
-
-
 
 
 var app = builder.Build();
@@ -61,6 +104,7 @@ app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 

@@ -12,5 +12,6 @@ namespace Business.Abstract
     {
         List<Comment> GetCommentById(int productId);
         void AddComment(CommentDTO comment);
+       
     }
 }
