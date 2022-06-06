@@ -21,16 +21,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
 
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
+builder.Services.AddAuthentication(x =>
 {
-    var key = Encoding.ASCII.GetBytes(builder.Configuration["JWTConfig:Key"]);
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(option =>
+{
+    var key = Encoding.ASCII.GetBytes("qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm");
+    var issuer = builder.Configuration["JWTConfig:Issuer"];
+    var audience = builder.Configuration["JWTConfig: Audience"];
 
     option.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateAudience = false,
-        ValidateIssuer = false,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        RequireExpirationTime = true,
+        ValidIssuer = issuer,
+        ValidAudience = audience
+
     };
 });
 
@@ -103,8 +113,10 @@ app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
 
-app.UseAuthorization();
+
 app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.MapControllers();
 

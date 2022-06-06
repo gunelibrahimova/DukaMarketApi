@@ -34,12 +34,13 @@ namespace WebAPI.Controllers
         {
             var user = _authManager.Login(model.Email);
 
-            if (user == null) return Ok(new {status = 404, message = "Bele bir istifadeci tapilmadi."});
+            if (user == null) return Ok(new { status = 404, message = "Bele bir istifadeci tapilmadi." });
 
-            if(user.Email == model.Email && user.Password == _hashingHandler.PasswordHash(model.Password))
+            if (user.Email == model.Email && user.Password == _hashingHandler.PasswordHash(model.Password))
             {
+                var role = _iroleManager.GetRole(user.Id);
                 var resultUser = new UserDTO(user.FullName, user.Email);
-                resultUser.Token = _tokenGenerator.Token(user);
+                resultUser.Token = _tokenGenerator.Token(user,role.Name);
 
                 return Ok(new {status= 200, message = resultUser});
             }
