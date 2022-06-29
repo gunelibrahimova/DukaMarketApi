@@ -20,6 +20,16 @@ namespace Business.Concrete
             _userRoleDal = userRoleDal;
         }
 
+        public void AddDefaultRole(int userId)
+        {
+            UserRole userRole = new UserRole()
+            {
+                RoleId =2,
+                K205UserId = userId,
+            };
+            _userRoleDal.Add(userRole);
+        }
+
         public void AddUserRole(AddUserRoleDTO userrole)
         {
             UserRole userRole = new()

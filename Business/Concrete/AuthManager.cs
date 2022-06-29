@@ -17,11 +17,13 @@ namespace Business.Concrete
     {
         private readonly IAuthDal _authDal;
         private readonly HashingHandler _hashingHandler;
+        private readonly IUserRoleManager _userRoleManager;
 
-        public AuthManager(IAuthDal authDal, HashingHandler hashingHandler)
+        public AuthManager(IAuthDal authDal, HashingHandler hashingHandler, IUserRoleManager userRoleManager)
         {
             _authDal = authDal;
             _hashingHandler = hashingHandler;
+            _userRoleManager = userRoleManager;
         }
 
         public K205User Login(string email)
@@ -53,12 +55,14 @@ namespace Business.Concrete
                 DateModified = DateTime.Now,
 
             };
-
-            
-
-           
-
             _authDal.Add(user);
+            var currentUser = _authDal.Get(x=>x.Email == user.Email);
+            _userRoleManager.AddDefaultRole(currentUser.Id);
+        }
+
+        public K205User GetUserByEmail(string email)
+        {
+            return _authDal.Get(x => x.Email == email);
         }
     }
 }

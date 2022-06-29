@@ -11,6 +11,7 @@ namespace Business.Abstract
     public interface IUserRoleManager
     {
         void AddUserRole(AddUserRoleDTO userrole);
+        void AddDefaultRole(int userId);
         List<UserRoleDTO> GetAllUserRoles();
         UserRoleDTO GetUserRoleById(int id);
     }

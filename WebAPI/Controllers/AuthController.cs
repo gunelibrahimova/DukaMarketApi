@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace WebAPI.Controllers
 {
@@ -39,7 +41,7 @@ namespace WebAPI.Controllers
             if (user.Email == model.Email && user.Password == _hashingHandler.PasswordHash(model.Password))
             {
                 var role = _iroleManager.GetRole(user.Id);
-                var resultUser = new UserDTO(user.FullName, user.Email);
+                var resultUser = new UserDTO(user.Id, user.FullName, user.Email);
                 resultUser.Token = _tokenGenerator.Token(user,role.Name);
 
                 return Ok(new {status= 200, message = resultUser});
@@ -51,24 +53,37 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Register(RegisterDTO model)
         {
 
-            //var userCheck = model.Email;
+            var user = _authManager.GetUserByEmail(model.Email);
 
-            //if (userCheck != )
-            //{
-            //    return Ok(new { status = 404, message = "Bu adli hesab movcuddur." });
-            //}
+            if (user != null)
+            {
+                return Ok(new { status = 201, message = "Email is exist" });
+            }
 
             var pass = model.Password;
 
             if(pass.Length >= 5)
             {
                 _authManager.Register(model);
-                return Ok("Okeydi.");
+                return Ok(new { status = 200, message = "Okey" });
             }
             return Ok(new { status = 404, message = "Parolunuzun uzunlugu en az 5 simvol olmalidir." });
 
+        }
+
+        [Authorize]
+        [HttpGet("getbyemail")]
+        public async Task<IActionResult> GetByEmail()
+        {
+            var _bearer_token = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+            var handler = new JwtSecurityTokenHandler();
+            var jwtSecurityTeam = handler.ReadJwtToken(_bearer_token);
+            var email = jwtSecurityTeam.Claims.FirstOrDefault(x => x.Type == "email").Value;
 
 
+            var user = _authManager.GetUserByEmail(email);
+            var result = new UserDTO(user.Id, user.FullName, user.Email);
+            return Ok(result);
         }
 
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -84,6 +99,5 @@ namespace WebAPI.Controllers
         {
             return _iroleManager.GetRole(userId);
         }
-        
     }
 }

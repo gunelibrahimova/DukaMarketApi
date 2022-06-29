@@ -33,7 +33,7 @@ namespace WebAPI.Controllers
         }
 
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("add")]
         public IActionResult AddProduct(AddProductDTO product)
         {
