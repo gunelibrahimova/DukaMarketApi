@@ -50,6 +50,13 @@ namespace WebAPI.Controllers
             return Ok(new {status = 200, message = "Mehsul elave olundu"});
         }
 
+
+        [HttpPost("uploadphoto")]
+        public IActionResult UploadPhoto(IFormFile file)
+        {
+            return Ok(new { status = 200, message = "Isledi" });
+        }
+
         [HttpGet("productlist")]
         public IActionResult ProductList()
         {
